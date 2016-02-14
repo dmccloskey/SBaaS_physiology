@@ -14,11 +14,11 @@ session = pg_orm.get_session();
 engine = pg_orm.get_engine();
 
 # your app...
-sys.path.append('C:/Users/dmccloskey-sbrg/Google Drive/SBaaS_LIMS')
-sys.path.append('C:/Users/dmccloskey-sbrg/Google Drive/SBaaS_statistics')
-sys.path.append('C:/Users/dmccloskey-sbrg/Google Drive/SBaaS_physiology')
-sys.path.append('C:/Users/dmccloskey-sbrg/Documents/GitHub/io_utilities')
-sys.path.append('C:/Users/dmccloskey-sbrg/Documents/GitHub/calculate_utilities')
+sys.path.append(pg_settings.datadir_settings['github']+'/SBaaS_LIMS')
+sys.path.append(pg_settings.datadir_settings['github']+'/SBaaS_statistics')
+sys.path.append(pg_settings.datadir_settings['github']+'/SBaaS_physiology')
+sys.path.append(pg_settings.datadir_settings['github']+'/io_utilities')
+sys.path.append(pg_settings.datadir_settings['github']+'/calculate_utilities')
 
 #functions to return sample names
 #physiology samples to calculate the growth rates
