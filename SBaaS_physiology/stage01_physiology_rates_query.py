@@ -42,8 +42,6 @@ class stage01_physiology_rates_query(sbaas_template_query):
                                                                                      data_stage01_physiology_rates.sample_name_short.like(sns)).delete(synchronize_session=False);
             elif experiment_id_I:
                 reset = self.session.query(data_stage01_physiology_rates).filter(data_stage01_physiology_rates.experiment_id.like(experiment_id_I)).delete(synchronize_session=False);
-            else:
-                reset = self.session.query(data_stage01_physiology_rates).delete(synchronize_session=False);
             self.session.commit();
         except SQLAlchemyError as e:
             print(e);
@@ -61,8 +59,6 @@ class stage01_physiology_rates_query(sbaas_template_query):
                                                                                              data_stage01_physiology_ratesAverages.sample_name_abbreviation.like(sna)).delete(synchronize_session=False);
             elif experiment_id_I:
                 reset = self.session.query(data_stage01_physiology_ratesAverages).filter(data_stage01_physiology_ratesAverages.experiment_id.like(experiment_id_I)).delete(synchronize_session=False);
-            else:
-                reset = self.session.query(data_stage01_physiology_ratesAverages).delete(synchronize_session=False);
             self.session.commit();
         except SQLAlchemyError as e:
             print(e);
@@ -395,7 +391,7 @@ class stage01_physiology_rates_query(sbaas_template_query):
                     'comment_':d.comment_})
             return data_O;
         except SQLAlchemyError as e:
-            print(e);get_experimentIDAndSampleName_analysisID_dataStage01PhysiologyAnalysis
+            print(e);
             
     ## Query from data_stage01_physiology_ratesAverages:
     # query met_ids from data_stage01_physiology_ratesAverages
@@ -403,7 +399,7 @@ class stage01_physiology_rates_query(sbaas_template_query):
         '''Querry rate data by sample id and met id that are used from
         the experiment'''
         try:
-            data = query_session.query(data_stage01_physiology_ratesAverages.sample_name_abbreviation,
+            data = self.session.query(data_stage01_physiology_ratesAverages.sample_name_abbreviation,
                     data_stage01_physiology_ratesAverages.met_id).filter(
                     data_stage01_physiology_ratesAverages.experiment_id.like(experiment_id_I),
                     data_stage01_physiology_ratesAverages.used_.is_(True),
@@ -423,7 +419,7 @@ class stage01_physiology_rates_query(sbaas_template_query):
         '''Querry rate data by sample id and met id that are used from
         the experiment'''
         try:
-            data = query_session.query(data_stage01_physiology_ratesAverages.slope_average,
+            data = self.session.query(data_stage01_physiology_ratesAverages.slope_average,
                     data_stage01_physiology_ratesAverages.intercept_average,
                     data_stage01_physiology_ratesAverages.rate_average,
                     data_stage01_physiology_ratesAverages.rate_lb,
