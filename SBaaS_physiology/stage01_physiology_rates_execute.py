@@ -7,12 +7,9 @@ from .stage01_physiology_data_query import stage01_physiology_data_query
 from SBaaS_LIMS.lims_sample_query import lims_sample_query
 from SBaaS_LIMS.lims_experiment_query import lims_experiment_query
 from SBaaS_LIMS.lims_biologicalMaterial_query import lims_biologicalMaterial_query
-# TODO: move to dependencies or make a seperate module
 #Resources
-from calculate_utilities.base_calculate import base_calculate
+from python_statistics.calculate_interface import calculate_interface
 from math import exp
-#Remove after refactor
-from .stage01_physiology_rates_postgresql_models import *
 
 class stage01_physiology_rates_execute(stage01_physiology_rates_io,
                                        stage01_physiology_data_query,
@@ -22,8 +19,8 @@ class stage01_physiology_rates_execute(stage01_physiology_rates_io,
     def execute_calculateGrowthRates(self,experiment_id_I,sample_name_short_I=[]):
         '''Calculate growth rates (hr-1) based on the sample time and measured OD600'''
 
-        calc = base_calculate();
-
+        calc = calculate_interface();
+        data_O = [];
         #query sample names
         print('executing calculating growth rates...')
         if sample_name_short_I:
@@ -50,20 +47,28 @@ class stage01_physiology_rates_execute(stage01_physiology_rates_io,
                 #calculate growth rate and r2
                 slope, intercept, r2, p_value, std_err = calc.calculate_growthRate(time_hrs,OD600)
                 #add rows to the data base
-                row = [];
-                row = data_stage01_physiology_rates(experiment_id_I, sns, met,
-                     slope, intercept, r2, slope, 'hr-1',
-                     p_value, std_err,
-                     True, None);
-                self.session.add(row);
-        self.session.commit();
+                row = {};
+                row = {'experiment_id':experiment_id_I,
+                    'sample_name_short':sns,
+                    'met_id':met,
+                    'slope':slope,
+                    'intercept':intercept,
+                    'r2':r2,
+                    'rate':slope,
+                    'rate_units':'hr-1',
+                    'p_value':p_value,
+                    'std_err':std_err,
+                    'used_':True,
+                    'comment_':None,};
+                data_O.append(row);
+        self.add_rows_table('data_stage01_physiology_rates',data_O);
     def execute_interpolateBiomassFromReplicates(self,experiment_id_I, sample_ids_I=[]):
         '''Interpolate the OD600 based on the Calculated growth rates (hr-1) of the respective replicate and time the sample was taken
         for samples in the experiment that do not have a measured OD600 value
         Use cases:
         1. Broth samples (Filtrate samples should be calculated off of the average)'''
         
-        calc = base_calculate();
+        calc = calculate_interface();
         data = [];
         #query sample_ids for the experiment that do not have an OD600 but have a time
         print('execute interpolate biomass from replicates...')
@@ -96,7 +101,8 @@ class stage01_physiology_rates_execute(stage01_physiology_rates_io,
     def execute_calculateRatesAverages(self,experiment_id_I,sample_name_abbreviations_I=[],met_ids_I=[]):
         '''Calculate the average rates based on the rates of the replicates'''
         
-        calc = base_calculate();
+        calc = calculate_interface();
+        data_O = [];
         #query sample_name abbreviations
         print('execute calcute rates averages...')
         if sample_name_abbreviations_I:
@@ -140,19 +146,30 @@ class stage01_physiology_rates_execute(stage01_physiology_rates_io,
                 if not None in rates:
                     rates_ave, rates_var, rates_lb, rates_ub = calc.calculate_ave_var(rates);
                 #add rows to the data base
-                row = [];
-                row = data_stage01_physiology_ratesAverages(experiment_id_I, sna,
-                     met, n, slopes_ave, intercepts_ave, rates_ave, rates_var,
-                     rates_lb, rates_ub, rates_units[0], True, None);
-                self.session.add(row);
-        self.session.commit();
+                row = {};
+                row = {'experiment_id':experiment_id_I,
+                    'sample_name_abbreviation':sna,
+                    'met_id':met,
+                    'n':n,
+                    'slope_average':slopes_ave,
+                    'intercept_average':intercepts_ave,
+                    'rate_average':rates_ave,
+                    'rate_var':rates_var,
+                    'rate_lb':rates_lb,
+                    'rate_ub':rates_ub,
+                    'rate_units':rates_units[0],
+                    'used_':True,
+                    'comment_':None,};
+                data_O.append(row);
+        #add data to the DB
+        self.add_rows_table('data_stage01_physiology_ratesAverages',data_O);
     def execute_interpolateBiomassFromAverages(self,experiment_id_I, sample_ids_I=[]):
         '''Interpolate the OD600 based on the Calculated growth rates (hr-1) of the average and time the sample was taken
         for samples in the experiment that do not have a measured OD600 value
         Use cases:
         1. a replicate is bad'''
         
-        calc = base_calculate();
+        calc = calculate_interface();
         data = [];
         #query sample_ids for the experiment that do not have an OD600 but have a time
         print('execute interoplate biomass from averages...')
@@ -186,7 +203,7 @@ class stage01_physiology_rates_execute(stage01_physiology_rates_io,
         Use cases:
         1. the sample Filtrate'''
         
-        calc = base_calculate();
+        calc = calculate_interface();
         data = [];
         #query sample_ids for the experiment that do not have an OD600
         print('execute calculate biomass from broth averages...')
@@ -213,7 +230,7 @@ class stage01_physiology_rates_execute(stage01_physiology_rates_io,
         self.update_data_samplePhysiologicalParameters(data)
     def execute_updatePhysiologicalParametersFromOD600(self, experiment_id_I, sample_ids_I=[]):
         '''Calculate physiological parameters from the OD600 and volume sample'''
-        calc = base_calculate();
+        calc = calculate_interface();
         data = [];
         #query sample_ids for the experiment that have an OD600, but do not have culture_density
         print('execute update physiological parameters from OD600...')
@@ -256,7 +273,7 @@ class stage01_physiology_rates_execute(stage01_physiology_rates_io,
         measured gDCW (calculated from the OD600),
         and calculated growth rate (hr-1)'''
         
-        calc = base_calculate();
+        calc = calculate_interface();
         data_O = [];
         #query sample names
         print('execute calculate uptake and secretion rates...')
@@ -325,7 +342,7 @@ class stage01_physiology_rates_execute(stage01_physiology_rates_io,
     def execute_calculateYield(self,experiment_id_I,sample_name_short_I=[],uptake_mets_I=[]):
         '''Calculate the yield from the growth rate and the uptake rates'''
         
-        calc = base_calculate();
+        calc = calculate_interface();
         #query sample names
         print('executing calculating yield...')
         if sample_name_short_I:

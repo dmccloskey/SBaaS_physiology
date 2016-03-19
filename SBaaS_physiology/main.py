@@ -18,7 +18,7 @@ sys.path.append(pg_settings.datadir_settings['github']+'/SBaaS_LIMS')
 sys.path.append(pg_settings.datadir_settings['github']+'/SBaaS_statistics')
 sys.path.append(pg_settings.datadir_settings['github']+'/SBaaS_physiology')
 sys.path.append(pg_settings.datadir_settings['github']+'/io_utilities')
-sys.path.append(pg_settings.datadir_settings['github']+'/calculate_utilities')
+sys.path.append(pg_settings.datadir_settings['github']+'/python_statistics')
 
 #functions to return sample names
 #physiology samples to calculate the growth rates

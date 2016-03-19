@@ -74,20 +74,21 @@ class stage01_physiology_rates_query(sbaas_template_query):
         if data_I:
             for d in data_I:
                 try:
-                    data_add = data_stage01_physiology_ratesAverages(
-                        d['experiment_id'],
-                        d['sample_name_abbreviation'],
-                        d['met_id'],
-                        d['n'],
-                        d['slope_average'],
-                        d['intercept_average'],
-                        d['rate_average'],
-                        d['rate_var'],
-                        d['rate_lb'],
-                        d['rate_ub'],
-                        d['rate_units'],
-                        d['used_'],
-                        d['comment_']);
+                    data_add = data_stage01_physiology_ratesAverages(d
+                        #d['experiment_id'],
+                        #d['sample_name_abbreviation'],
+                        #d['met_id'],
+                        #d['n'],
+                        #d['slope_average'],
+                        #d['intercept_average'],
+                        #d['rate_average'],
+                        #d['rate_var'],
+                        #d['rate_lb'],
+                        #d['rate_ub'],
+                        #d['rate_units'],
+                        #d['used_'],
+                        #d['comment_']
+                        );
                     self.session.add(data_add);
                 except SQLAlchemyError as e:
                     print(e);

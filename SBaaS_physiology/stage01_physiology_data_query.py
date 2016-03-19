@@ -45,18 +45,21 @@ class stage01_physiology_data_query(sbaas_template_query):
         if data_I:
             for d in data_I:
                 try:
-                    data_add = data_stage01_physiology_data(d['experiment_id'],
-                                            d['sample_id'],
-                                            #d['sample_name_short'],
-                                            #d['time_point'],
-                                            #d['sample_date'],
-                                            d['met_id'],
-                                            d['data_raw'],
-                                            d['data_corrected'],
-                                            d['data_units'],
-                                            d['data_reference'],
-                                            d['used_'],
-                                            d['notes']); #d['comment_']
+                    data_add = data_stage01_physiology_data(d
+                        #d['experiment_id'],
+                        #d['sample_id'],
+                        ##d['sample_name_short'],
+                        ##d['time_point'],
+                        ##d['sample_date'],
+                        #d['met_id'],
+                        #d['data_raw'],
+                        #d['data_corrected'],
+                        #d['data_units'],
+                        #d['data_reference'],
+                        #d['used_'],
+                        #d['notes']
+                        );
+                    #d['comment_']
                     self.session.add(data_add);
                 except SQLAlchemyError as e:
                     print(e);

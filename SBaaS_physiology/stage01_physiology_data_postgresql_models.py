@@ -23,8 +23,20 @@ class data_stage01_physiology_data(Base):
     __table_args__ = (
             UniqueConstraint('experiment_id','sample_id','met_id','data_reference','data_units'),
             )
+    def __init__(self,
+                row_dict_I,
+                ):
+        self.sample_id=row_dict_I['sample_id'];
+        self.experiment_id=row_dict_I['experiment_id'];
+        self.comment_=row_dict_I['comment_'];
+        self.used_=row_dict_I['used_'];
+        self.data_reference=row_dict_I['data_reference'];
+        self.data_units=row_dict_I['data_units'];
+        self.data_corrected=row_dict_I['data_corrected'];
+        self.data_raw=row_dict_I['data_raw'];
+        self.met_id=row_dict_I['met_id'];
 
-    def __init__(self, experiment_id_I,sample_id_I,
+    def __set__row__(self, experiment_id_I,sample_id_I,
                  #sample_name_short_I,time_point_I,sample_date_I,
                  met_id_I,data_raw_I,data_corrected_I,
                  data_units_I,data_reference_I,used__I,comment__I,):

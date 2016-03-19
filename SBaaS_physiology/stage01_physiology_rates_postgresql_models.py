@@ -22,8 +22,23 @@ class data_stage01_physiology_rates(Base):
     __table_args__ = (
             UniqueConstraint('experiment_id','sample_name_short','met_id'),
             )
+    def __init__(self,
+                row_dict_I,
+                ):
+        self.std_err=row_dict_I['std_err'];
+        self.experiment_id=row_dict_I['experiment_id'];
+        self.sample_name_short=row_dict_I['sample_name_short'];
+        self.met_id=row_dict_I['met_id'];
+        self.slope=row_dict_I['slope'];
+        self.intercept=row_dict_I['intercept'];
+        self.r2=row_dict_I['r2'];
+        self.rate=row_dict_I['rate'];
+        self.rate_units=row_dict_I['rate_units'];
+        self.p_value=row_dict_I['p_value'];
+        self.used_=row_dict_I['used_'];
+        self.comment_=row_dict_I['comment_'];
 
-    def __init__(self, experiment_id_I, sample_name_short_I,
+    def __set__row__(self, experiment_id_I, sample_name_short_I,
                  met_id_I, slope_I, intercept_I,
                  r2_I, rate_I, rate_units_I,
                  p_value_I, std_err_I,
@@ -79,8 +94,24 @@ class data_stage01_physiology_ratesAverages(Base):
     __table_args__ = (
             UniqueConstraint('experiment_id','sample_name_abbreviation','met_id'),
             )
+    def __init__(self,
+                row_dict_I,
+                ):
+        self.rate_var=row_dict_I['rate_var'];
+        self.rate_average=row_dict_I['rate_average'];
+        self.intercept_average=row_dict_I['intercept_average'];
+        self.slope_average=row_dict_I['slope_average'];
+        self.experiment_id=row_dict_I['experiment_id'];
+        self.sample_name_abbreviation=row_dict_I['sample_name_abbreviation'];
+        self.met_id=row_dict_I['met_id'];
+        self.n=row_dict_I['n'];
+        self.comment_=row_dict_I['comment_'];
+        self.used_=row_dict_I['used_'];
+        self.rate_units=row_dict_I['rate_units'];
+        self.rate_ub=row_dict_I['rate_ub'];
+        self.rate_lb=row_dict_I['rate_lb'];
 
-    def __init__(self, experiment_id_I, sample_name_abbreviation_I,
+    def __set__row__(self, experiment_id_I, sample_name_abbreviation_I,
                  met_id_I, n_I, slope_average_I, intercept_average_I, rate_average_I, rate_var_I,
                  rate_lb_I, rate_ub_I, rate_units_I, used__I, comment__I):
         self.experiment_id = experiment_id_I;
@@ -99,7 +130,7 @@ class data_stage01_physiology_ratesAverages(Base):
 
     def __repr__dict__(self):
         return {'id':self.id,
-                'experiment_id':self.experiment_id,
+            'experiment_id':self.experiment_id,
             'sample_name_abbreviation':self.sample_name_abbreviation,
             'met_id':self.met_id,
             'n':self.n,
