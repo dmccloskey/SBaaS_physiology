@@ -92,7 +92,7 @@ class data_stage01_physiology_ratesAverages(Base):
     comment_ = Column(Text);
 
     __table_args__ = (
-            UniqueConstraint('experiment_id','sample_name_abbreviation','met_id'),
+            UniqueConstraint('experiment_id','sample_name_abbreviation','met_id','rate_units'),
             )
     def __init__(self,
                 row_dict_I,
