@@ -22,12 +22,6 @@ class stage01_physiology_rates_query(sbaas_template_query):
                     'data_stage01_physiology_ratesAverages':data_stage01_physiology_ratesAverages,
                         };
         self.set_supportedTables(tables_supported);
-    def drop_dataStage01_physiology_rates(self):
-        try:
-            data_stage01_physiology_rates.__table__.drop(self.engine,True);
-            data_stage01_physiology_ratesAverages.__table__.drop(self.engine,True);
-        except SQLAlchemyError as e:
-            print(e);
     def reset_dataStage01_physiology_rates(self,experiment_id_I = None,sample_name_shorts_I=[],met_ids_I=[]):
         try:
             if experiment_id_I and sample_name_shorts_I and met_ids_I:
@@ -60,12 +54,6 @@ class stage01_physiology_rates_query(sbaas_template_query):
             elif experiment_id_I:
                 reset = self.session.query(data_stage01_physiology_ratesAverages).filter(data_stage01_physiology_ratesAverages.experiment_id.like(experiment_id_I)).delete(synchronize_session=False);
             self.session.commit();
-        except SQLAlchemyError as e:
-            print(e);
-    def initialize_dataStage01_physiology_rates(self):
-        try:
-            data_stage01_physiology_ratesAverages.__table__.create(self.engine,True);
-            data_stage01_physiology_rates.__table__.create(self.engine,True);
         except SQLAlchemyError as e:
             print(e);
 
@@ -308,6 +296,17 @@ class stage01_physiology_rates_query(sbaas_template_query):
             if data: 
                 slope, intercept, r2, rate, rate_units, p_value, std_err = data.slope, data.intercept, data.r2, data.rate, data.rate_units, data.p_value, data.std_err;
             return slope, intercept, r2, rate, rate_units, p_value, std_err;
+        except SQLAlchemyError as e:
+            print(e);
+    def get_rows_experimentIDAndSampleNameShort_dataStage01PhysiologyRates(self,experiment_id_I,sample_name_short_I):
+        '''Querry rows by sample name abbreviation that are used from the experiment'''
+        try:
+            data = self.session.query(data_stage01_physiology_rates).filter(
+                    data_stage01_physiology_rates.sample_name_short.like(sample_name_short_I),
+                    data_stage01_physiology_rates.experiment_id.like(experiment_id_I),
+                    data_stage01_physiology_rates.used_.is_(True)).all();
+            data_O = [d.__repr__dict__() for d in data]
+            return data_O;
         except SQLAlchemyError as e:
             print(e);
     

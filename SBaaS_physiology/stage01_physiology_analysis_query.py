@@ -93,3 +93,16 @@ class stage01_physiology_analysis_query(sbaas_template_query):
             return  experiment_id_O,sample_name_abbreviation_O;
         except SQLAlchemyError as e:
             print(e);
+    def get_rows_analysisID_dataStage01PhysiologyAnalysis(self,analysis_id_I):
+        '''Query rows that are used from the analysis'''
+        try:
+            data = self.session.query(data_stage01_physiology_analysis).filter(
+                    data_stage01_physiology_analysis.analysis_id.like(analysis_id_I),
+                    data_stage01_physiology_analysis.used_.is_(True)).order_by(
+                    data_stage01_physiology_analysis.experiment_id.asc(),
+                    data_stage01_physiology_analysis.sample_name_abbreviation.asc(),
+                    data_stage01_physiology_analysis.sample_name_short.asc()).all();
+            rows_O = [d.__repr__dict__() for d in data];
+            return rows_O;
+        except SQLAlchemyError as e:
+            print(e);

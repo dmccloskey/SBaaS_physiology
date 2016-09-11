@@ -20,16 +20,6 @@ class stage01_physiology_data_query(sbaas_template_query):
         tables_supported = {'data_stage01_physiology_data':data_stage01_physiology_data,
                         };
         self.set_supportedTables(tables_supported);
-    def initialize_dataStage01_physiology_data(self):
-        try:
-            data_stage01_physiology_data.__table__.create(self.engine,True);
-        except SQLAlchemyError as e:
-            print(e);
-    def drop_dataStage01_physiology_data(self):
-        try:
-            data_stage01_physiology_data.__table__.drop(self.engine,True);
-        except SQLAlchemyError as e:
-            print(e);
     def reset_dataStage01_physiology_data(self,experiment_id_I = None):
         try:
             if experiment_id_I:
@@ -39,7 +29,6 @@ class stage01_physiology_data_query(sbaas_template_query):
             self.session.commit();
         except SQLAlchemyError as e:
             print(e);
-
     def add_dataStage01PhysiologyData(self, data_I):
         '''add rows of data_stage01_physiology_data'''
         if data_I:
@@ -64,7 +53,6 @@ class stage01_physiology_data_query(sbaas_template_query):
                 except SQLAlchemyError as e:
                     print(e);
             self.session.commit();
-
     def update_dataStage01PhysiologyData(self,data_I):
         '''update rows of data_stage01_physiology_data'''
         if data_I:
@@ -181,8 +169,7 @@ class stage01_physiology_data_query(sbaas_template_query):
                 data_corrected_O.append(d.data_corrected);
             return sample_date_O,data_corrected_O;
         except SQLAlchemyError as e:
-            print(e);
-    # query sample_date, data_corrected, and sample_ids from data_stage01_physiology_data
+            print(e)
     def get_sampleDateAndDataCorrectedAndSampleIDs_experimentIDAndSampleNameShortAndMetIDAndDataUnits(self,experiment_id_I,exp_type_I,sample_name_short_I,met_id_I,data_units_I):
         '''Querry time and data_corrected by sample name short that are used from
         the experiment sorted by time'''
@@ -209,6 +196,36 @@ class stage01_physiology_data_query(sbaas_template_query):
                 data_corrected_O.append(d.data_corrected);
                 sample_id_O.append(d.sample_id);
             return sample_date_O,data_corrected_O,sample_id_O;
+        except SQLAlchemyError as e:
+            print(e);
+    def get_sampleDateAndDataCorrected_experimentIDAndSampleNameShort(self,experiment_id_I,sample_name_short_I,data_units_I=['mM','OD600']):
+        '''Query time and data_corrected by sample name short that are used from
+        the experiment sorted by time'''
+        try:
+            data = self.session.query(sample_description.sample_date,
+                    sample_description.sample_name_short,
+                    sample_description.sample_name_abbreviation,
+                    data_stage01_physiology_data.id,
+                    data_stage01_physiology_data.data_corrected,
+                    data_stage01_physiology_data.experiment_id,
+                    data_stage01_physiology_data.sample_id,
+                    data_stage01_physiology_data.met_id,
+                    data_stage01_physiology_data.data_units,
+                    data_stage01_physiology_data.data_reference).filter(
+                    data_stage01_physiology_data.experiment_id.like(experiment_id_I),
+                    data_stage01_physiology_data.data_units.in_(data_units_I),
+                    data_stage01_physiology_data.used_.is_(True),
+                    experiment.id.like(experiment_id_I),
+                    experiment.sample_name.like(data_stage01_physiology_data.sample_id),
+                    experiment.sample_name.like(sample.sample_name),
+                    sample.sample_id.like(sample_description.sample_id),
+                    sample_description.sample_name_short.like(sample_name_short_I)).order_by(
+                    data_stage01_physiology_data.experiment_id.asc(),
+                    data_stage01_physiology_data.data_units.asc(),
+                    data_stage01_physiology_data.met_id.asc(),
+                    sample_description.sample_date.asc()).all();
+            rows_O = [d._asdict() for d in data];
+            return rows_O;
         except SQLAlchemyError as e:
             print(e);
             

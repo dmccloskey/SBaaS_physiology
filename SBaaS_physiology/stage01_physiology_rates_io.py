@@ -6,12 +6,14 @@ from SBaaS_base.sbaas_template_io import sbaas_template_io
 # Resources
 from io_utilities.base_importData import base_importData
 from io_utilities.base_exportData import base_exportData
+from ddt_python.ddt_container import ddt_container
+from ddt_python.ddt_container_filterMenuAndChart2dAndTable import ddt_container_filterMenuAndChart2dAndTable
 
 class stage01_physiology_rates_io(stage01_physiology_rates_query,
                                   stage01_physiology_analysis_query,
                                   sbaas_template_io):
 
-    def export_dataStage01PhysiologyRatesAverages_js(self,analysis_id_I,data_dir_I="tmp"):
+    def export_dataStage01PhysiologyRatesAverages_js_v01(self,analysis_id_I,data_dir_I="tmp"):
         """Export data_stage01_physiology_ratesAverages to js file"""
         # get the analysis information
         experiment_ids,sample_name_abbreviations = [],[];
@@ -32,7 +34,7 @@ class stage01_physiology_rates_io(stage01_physiology_rates_query,
         biomass_met_ids = ['biomass','yield_ss'];
         uptakesecretion_met_ids = [x for x in met_ids if not x in biomass_met_ids];
         # visualization parameters
-        data1_keys = ['sample_name_abbreviation', 'met_id','rate_units']; #rate_units contain string characters that are registered as regular expressions
+        data1_keys = ['experiment_id','sample_name_abbreviation', 'met_id','rate_units'];
         data1_nestkeys = ['met_id'];
         data1_keymap = {'xdata':'met_id','ydata':'rate_average',
                 'serieslabel':'sample_name_abbreviation','featureslabel':'met_id',
@@ -80,34 +82,146 @@ class stage01_physiology_rates_io(stage01_physiology_rates_query,
         tabletileparameters2_O.update(tableparameters2_O);
         parametersobject_O = [svgtileparameters1_O,svgtileparameters2_O,tabletileparameters1_O,tabletileparameters2_O];
         tile2datamap_O = {"tile1":[0],"tile2":[1],"tile3":[0],"tile4":[1]};
+        filtermenuobject_O = None;
         # dump the data to a json file
-        data_str = 'var ' + 'data' + ' = ' + json.dumps(dataobject_O) + ';';
-        parameters_str = 'var ' + 'parameters' + ' = ' + json.dumps(parametersobject_O) + ';';
-        tile2datamap_str = 'var ' + 'tile2datamap' + ' = ' + json.dumps(tile2datamap_O) + ';';
+        ddtutilities = ddt_container(parameters_I = parametersobject_O,data_I = dataobject_O,tile2datamap_I = tile2datamap_O,filtermenu_I = filtermenuobject_O);
         if data_dir_I=='tmp':
             filename_str = self.settings['visualization_data'] + '/tmp/ddt_data.js'
-        elif data_dir_I=='project':
-            filename_str = self.settings['visualization_data'] + '/project/' + analysis_id_I + '_data_stage01_physiology_ratesAverages' + '.js'
         elif data_dir_I=='data_json':
-            data_json_O = data_str + '\n' + parameters_str + '\n' + tile2datamap_str;
+            data_json_O = ddtutilities.get_allObjects_js();
             return data_json_O;
         with open(filename_str,'w') as file:
-            file.write(data_str);
-            file.write(parameters_str);
-            file.write(tile2datamap_str);       
-    def import_dataStage01PhysiologyRatesAverages_add(self, filename):
-        '''table adds'''
-        data = base_importData();
-        data.read_csv(filename);
-        data.format_data();
-        self.add_dataStage01PhysiologyRatesAverages(data.data);
-        data.clear_data();
+            file.write(ddtutilities.get_allObjects());  
+    def export_dataStage01PhysiologyRatesAverages_js(self,analysis_id_I,data_dir_I="tmp"):
+        """Export data_stage01_physiology_ratesAverages to js file"""
+        # get the analysis information
+        experiment_ids,sample_name_abbreviations = [],[];
+        experiment_ids,sample_name_abbreviations = self.get_experimentIDAndSampleName_analysisID_dataStage01PhysiologyAnalysis(analysis_id_I);
+        data_O = [];
+        for sna_cnt,sna in enumerate(sample_name_abbreviations):
+            data_tmp = [];
+            data_tmp = self.get_rows_experimentIDAndSampleNameAbbreviation_dataStage01PhysiologyRatesAverages(experiment_ids[sna_cnt],sna);
+            if data_tmp: data_O.extend(data_tmp);
 
-    def import_dataStage01PhysiologyRatesAverages_update(self, filename):
-        '''table adds'''
-        data = base_importData();
-        data.read_csv(filename);
-        data.format_data();
-        self.update_dataStage01PhysiologyRatesAverages(data.data);
-        data.clear_data();
+        # visualization parameters
+        data1_keys = ['experiment_id','sample_name_abbreviation', 'met_id','rate_units'];
+        data1_nestkeys = ['met_id'];
+        data1_keymap = {'xdata':'met_id','ydata':'rate_average',
+                'serieslabel':'sample_name_abbreviation','featureslabel':'met_id',
+                'ydatalb':'rate_lb','ydataub':'rate_ub'};
+        
+        nsvgtable = ddt_container_filterMenuAndChart2dAndTable();
+        nsvgtable.make_filterMenuAndChart2dAndTable(
+                data_filtermenu=data_O,
+                data_filtermenu_keys=data1_keys,
+                data_filtermenu_nestkeys=data1_nestkeys,
+                data_filtermenu_keymap=data1_keymap,
+                data_svg_keys=None,
+                data_svg_nestkeys=None,
+                data_svg_keymap=None,
+                data_table_keys=None,
+                data_table_nestkeys=None,
+                data_table_keymap=None,
+                data_svg=None,
+                data_table=None,
+                svgtype='verticalbarschart2d_01',
+                tabletype='responsivetable_01',
+                svgx1axislabel='met_id',
+                svgy1axislabel='Rate',
+                tablekeymap = [data1_keymap],
+                svgkeymap = [data1_keymap], #calculated on the fly
+                formtile2datamap=[0],
+                tabletile2datamap=[0],
+                svgtile2datamap=[0], #calculated on the fly
+                svgfilters=None,
+                svgtileheader='Physiological data',
+                tablefilters=None,
+                tableheaders=None,
+                svgparameters_I= {
+                             "svgmargin":{ 'top': 50, 'right': 150, 'bottom': 50, 'left': 50 },
+                            "svgwidth":500,"svgheight":350,
+                            'colclass':"col-sm-8"
+                            }
+                );
+
+        if data_dir_I=='tmp':
+            filename_str = self.settings['visualization_data'] + '/tmp/ddt_data.js'
+        elif data_dir_I=='data_json':
+            data_json_O = nsvgtable.get_allObjects_js();
+            return data_json_O;
+        with open(filename_str,'w') as file:
+            file.write(nsvgtable.get_allObjects()); 
+    def export_dataStage01PhysiologyRates_js(self,analysis_id_I,data_dir_I="tmp"):
+        """Export data_stage01_physiology_rates to js file"""
+        # get the analysis information
+        sample_name_shorts = [];
+        sample_name_shorts = self.get_rows_analysisID_dataStage01PhysiologyAnalysis(analysis_id_I);
+        data_O = [];
+        for sns_cnt,sns in enumerate(sample_name_shorts):
+            data_tmp = [];
+            data_tmp = self.get_rows_experimentIDAndSampleNameShort_dataStage01PhysiologyRates(sns['experiment_id'],sns['sample_name_short']);
+            if data_tmp: 
+                for d in data_tmp:
+                    d['sample_name_abbreviation'] = sns['sample_name_short'];
+                    d['rate_lb'] = None
+                    d['rate_ub'] = None
+                    if not d['std_err'] is None:
+                        d['rate_lb'] = d['rate']-d['std_err']
+                        d['rate_ub'] = d['rate']+d['std_err']
+                    data_O.append(d);
+
+        # visualization parameters
+        data1_keys = ['experiment_id','sample_name_abbreviation','sample_name_short', 'met_id','rate_units'];
+        data1_nestkeys = ['met_id'];
+        data1_keymap = {
+            'xdata':'met_id',
+            'ydata':'rate',
+            'ydatamean':'rate',
+            'serieslabel':'sample_name_short',
+            'featureslabel':'met_id',
+            'ydatalb':'rate_lb',
+            'ydataub':'rate_ub'
+            };
+        
+        nsvgtable = ddt_container_filterMenuAndChart2dAndTable();
+        nsvgtable.make_filterMenuAndChart2dAndTable(
+                data_filtermenu=data_O,
+                data_filtermenu_keys=data1_keys,
+                data_filtermenu_nestkeys=data1_nestkeys,
+                data_filtermenu_keymap=data1_keymap,
+                data_svg_keys=None,
+                data_svg_nestkeys=None,
+                data_svg_keymap=None,
+                data_table_keys=None,
+                data_table_nestkeys=None,
+                data_table_keymap=None,
+                data_svg=None,
+                data_table=None,
+                svgtype='boxandwhiskersplot2d_02',
+                tabletype='responsivetable_01',
+                svgx1axislabel='met_id',
+                svgy1axislabel='Rate',
+                tablekeymap = [data1_keymap],
+                svgkeymap = [data1_keymap], #calculated on the fly
+                formtile2datamap=[0],
+                tabletile2datamap=[0],
+                svgtile2datamap=[0], #calculated on the fly
+                svgfilters=None,
+                svgtileheader='Physiological data',
+                tablefilters=None,
+                tableheaders=None,
+                svgparameters_I= {
+                             "svgmargin":{ 'top': 50, 'right': 150, 'bottom': 50, 'left': 50 },
+                            "svgwidth":500,"svgheight":350,
+                            'colclass':"col-sm-8"
+                            }
+                );
+
+        if data_dir_I=='tmp':
+            filename_str = self.settings['visualization_data'] + '/tmp/ddt_data.js'
+        elif data_dir_I=='data_json':
+            data_json_O = nsvgtable.get_allObjects_js();
+            return data_json_O;
+        with open(filename_str,'w') as file:
+            file.write(nsvgtable.get_allObjects()); 
    
