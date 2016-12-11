@@ -1,4 +1,4 @@
-#System
+﻿#System
 from time import mktime,strptime
 from datetime import datetime
 #SBaaS
@@ -275,6 +275,7 @@ class stage01_physiology_rates_execute(stage01_physiology_rates_io,
         
         calc = calculate_interface();
         data_O = [];
+        data_QC = [];
         #query sample names
         print('execute calculate uptake and secretion rates...')
         if sample_name_short_I:
@@ -325,17 +326,25 @@ class stage01_physiology_rates_execute(stage01_physiology_rates_io,
                     tmp['culture_density [gDW*L-1]']=culture_density[si_cnt];
                     tmp['concentration [mM]']=conc[si_cnt];
                     tmp['growth_rate [hr-1]']=gr_rate;
-                    data_O.append(tmp);
+                    data_QC.append(tmp);
                 #add rows to the data base
-                row = [];
-                row = data_stage01_physiology_rates(experiment_id_I, sns, met,
-                     slope, intercept, r2, rate, 'mmol*gDCW-1*hr-1',
-                     p_value, std_err,
-                     True, None);
-                self.session.add(row);
-        self.session.commit();
+                row = {};
+                row = {'experiment_id':experiment_id_I,
+                    'sample_name_short':sns,
+                    'met_id':met,
+                    'slope':slope,
+                    'intercept':intercept,
+                    'r2':r2,
+                    'rate':slope,
+                    'rate_units':'mmol*gDCW-1*hr-1',
+                    'p_value':p_value,
+                    'std_err':std_err,
+                    'used_':True,
+                    'comment_':None,};
+                data_O.append(row);
+        self.add_rows_table('data_stage01_physiology_rates',data_O);
         if QC_filename_O:
-            io = base_exportData(data_O);
+            io = base_exportData(data_QC);
             io.write_dict2csv(QC_filename_O,['sample_name_short','met_id','sample_id',
                                              'time [hr]','OD600','culture_density [gDW*L-1]',
                                              'concentration [mM]','growth_rate [hr-1]']);
@@ -343,6 +352,7 @@ class stage01_physiology_rates_execute(stage01_physiology_rates_io,
         '''Calculate the yield from the growth rate and the uptake rates'''
         
         calc = calculate_interface();
+        data_O = [];
         #query sample names
         print('executing calculating yield...')
         if sample_name_short_I:
@@ -393,12 +403,20 @@ class stage01_physiology_rates_execute(stage01_physiology_rates_io,
             yield_ss,yield_ss_units = calc.calculate_yield_growthRateAndUptakeRates(rate_biomass,uptake_rates);
             yield_ss_units = 'gDCW*mmol-1 of glc-D'; # hard-coded value that needs to be updated
             #add rows to the data base
-            row = None;
-            row = data_stage01_physiology_rates(experiment_id_I, sns, 'yield_ss',
-                    None, None, None, yield_ss, yield_ss_units,
-                    None, None,
-                    True, None);
-            self.session.add(row);
-        self.session.commit();
+            row = {};
+            row = {'experiment_id':experiment_id_I,
+                'sample_name_short':sns,
+                'met_id':'yield_ss',
+                'slope':None,
+                'intercept':None,
+                'r2':None,
+                'rate':yield_ss,
+                'rate_units':yield_ss_units,
+                'p_value':None,
+                'std_err':None,
+                'used_':True,
+                'comment_':None,};
+            data_O.append(row);
+        self.add_rows_table('data_stage01_physiology_rates',data_O);
 
     
