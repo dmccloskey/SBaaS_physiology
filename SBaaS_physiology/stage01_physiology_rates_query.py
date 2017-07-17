@@ -30,8 +30,8 @@ class stage01_physiology_rates_query(sbaas_template_query):
                         reset = self.session.query(data_stage01_physiology_rates).filter(data_stage01_physiology_rates.experiment_id.like(experiment_id_I),
                                                                                      data_stage01_physiology_rates.sample_name_short.like(sns),
                                                                                      data_stage01_physiology_rates.met_id.like(met)).delete(synchronize_session=False);
-            elif experiment_id_I and sample_name_short_I:
-                for sns in sample_name_short_I:
+            elif experiment_id_I and sample_name_shorts_I:
+                for sns in sample_name_shorts_I:
                     reset = self.session.query(data_stage01_physiology_rates).filter(data_stage01_physiology_rates.experiment_id.like(experiment_id_I),
                                                                                      data_stage01_physiology_rates.sample_name_short.like(sns)).delete(synchronize_session=False);
             elif experiment_id_I:
