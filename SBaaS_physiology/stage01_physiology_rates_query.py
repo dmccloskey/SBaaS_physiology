@@ -4,6 +4,7 @@ from SBaaS_LIMS.lims_sample_postgresql_models import *
 
 from .stage01_physiology_rates_postgresql_models import *
 from .stage01_physiology_data_postgresql_models import *
+from .stage01_physiology_analysis_postgresql_models import *
 
 from SBaaS_base.sbaas_base_query_update import sbaas_base_query_update
 from SBaaS_base.sbaas_base_query_drop import sbaas_base_query_drop
@@ -145,6 +146,15 @@ class stage01_physiology_rates_query(sbaas_template_query):
                     sample_description.sample_name_abbreviation.like(sample_name_abbreviation_I)).group_by(
                     sample_description.sample_name_short).order_by(
                     sample_description.sample_name_short.asc()).all();
+            #sample_names = self.session.query(data_stage01_physiology_rates.sample_name_short).filter(
+            #        data_stage01_physiology_rates.experiment_id.like(experiment_id_I),
+            #        data_stage01_physiology_rates.used_.is_(True),
+            #        data_stage01_physiology_analysis.experiment_id.like(experiment_id_I),
+            #        data_stage01_physiology_analysis.sample_name_short.like(data_stage01_physiology_rates.sample_name_short),
+            #        data_stage01_physiology_rates.met_id.like(met_id_I),
+            #        data_stage01_physiology_analysis.sample_name_abbreviation.like(sample_name_abbreviation_I)).group_by(
+            #        data_stage01_physiology_rates.sample_name_short).order_by(
+            #        data_stage01_physiology_rates.sample_name_short.asc()).all();
             sample_names_O = [];
             for sn in sample_names: sample_names_O.append(sn.sample_name_short);
             return sample_names_O;
