@@ -133,28 +133,28 @@ class stage01_physiology_rates_query(sbaas_template_query):
         '''Querry sample name short that are used from
         the experiment'''
         try:
-            sample_names = self.session.query(sample_description.sample_name_short).filter(
-                    data_stage01_physiology_rates.experiment_id.like(experiment_id_I),
-                    data_stage01_physiology_rates.used_.is_(True),
-                    experiment.id.like(experiment_id_I),
-                    experiment.exp_type_id == exp_type_I,
-                    experiment.sample_name.like(data_stage01_physiology_data.sample_id),
-                    experiment.sample_name.like(sample.sample_name),
-                    sample.sample_id.like(sample_description.sample_id),
-                    sample_description.sample_name_short.like(data_stage01_physiology_rates.sample_name_short),
-                    data_stage01_physiology_rates.met_id.like(met_id_I),
-                    sample_description.sample_name_abbreviation.like(sample_name_abbreviation_I)).group_by(
-                    sample_description.sample_name_short).order_by(
-                    sample_description.sample_name_short.asc()).all();
-            #sample_names = self.session.query(data_stage01_physiology_rates.sample_name_short).filter(
+            #sample_names = self.session.query(sample_description.sample_name_short).filter(
             #        data_stage01_physiology_rates.experiment_id.like(experiment_id_I),
             #        data_stage01_physiology_rates.used_.is_(True),
-            #        data_stage01_physiology_analysis.experiment_id.like(experiment_id_I),
-            #        data_stage01_physiology_analysis.sample_name_short.like(data_stage01_physiology_rates.sample_name_short),
+            #        experiment.id.like(experiment_id_I),
+            #        experiment.exp_type_id == exp_type_I,
+            #        experiment.sample_name.like(data_stage01_physiology_data.sample_id),
+            #        experiment.sample_name.like(sample.sample_name),
+            #        sample.sample_id.like(sample_description.sample_id),
+            #        sample_description.sample_name_short.like(data_stage01_physiology_rates.sample_name_short),
             #        data_stage01_physiology_rates.met_id.like(met_id_I),
-            #        data_stage01_physiology_analysis.sample_name_abbreviation.like(sample_name_abbreviation_I)).group_by(
-            #        data_stage01_physiology_rates.sample_name_short).order_by(
-            #        data_stage01_physiology_rates.sample_name_short.asc()).all();
+            #        sample_description.sample_name_abbreviation.like(sample_name_abbreviation_I)).group_by(
+            #        sample_description.sample_name_short).order_by(
+            #        sample_description.sample_name_short.asc()).all();
+            sample_names = self.session.query(data_stage01_physiology_rates.sample_name_short).filter(
+                    data_stage01_physiology_rates.experiment_id.like(experiment_id_I),
+                    data_stage01_physiology_rates.used_.is_(True),
+                    data_stage01_physiology_analysis.experiment_id.like(experiment_id_I),
+                    data_stage01_physiology_analysis.sample_name_short.like(data_stage01_physiology_rates.sample_name_short),
+                    data_stage01_physiology_rates.met_id.like(met_id_I),
+                    data_stage01_physiology_analysis.sample_name_abbreviation.like(sample_name_abbreviation_I)).group_by(
+                    data_stage01_physiology_rates.sample_name_short).order_by(
+                    data_stage01_physiology_rates.sample_name_short.asc()).all();
             sample_names_O = [];
             for sn in sample_names: sample_names_O.append(sn.sample_name_short);
             return sample_names_O;
